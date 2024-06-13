@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Generator and Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0066cc;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            background: #ddd;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background: #0066cc;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 0 4px 4px 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #0066cc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        pre {
+            background: #eaeaea;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .progress {
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 25px;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flashcard Generator and Uploader</h1>
+    <div class="container">
+        <button class="btn btn-primary mb-3" onclick="showSection('prompt-section')">Flashcard from Prompt</button>
+        <button class="btn btn-secondary mb-3" onclick="showSection('upload-section')">Subir from JSON</button>
+
+        <div id="prompt-section" class="section active">
+            <h2>Flashcard Prompt Generator</h2>
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('text-segment')">Text Segment</div>
+                    <div class="tab" onclick="showTab('flashcard-structure')">Flashcard Structure</div>
+                    <div class="tab" onclick="showTab('instructions')">Instructions</div>
+                    <div class="tab" onclick="showTab('tags-suggested')">Tags Suggested</div>
+                    <div class="tab" onclick="showTab('image-path')">Image Path Format</div>
+                    <div class="tab" onclick="showTab('expected-output')">Expected Output Example</div>
+                </div>
+                <div id="text-segment" class="tab-content active">
+                    <h3>Text Segment</h3>
+                    <textarea id="text-input" placeholder="Enter your text here..."></textarea>
+                </div>
+                <div id="flashcard-structure" class="tab-content">
+                    <h3>Flashcard Structure</h3>
+                    <textarea id="structure-input">{
+"Question": "",
+"Option1": "",
+"Option2": "",
+"Option3": "",
+"Option4": "",
+"Answer": "",
+"Explanation": "",
+"Image": "",
+"Tags": []
+}</textarea>
+                </div>
+                <div id="instructions" class="tab-content">
+                    <h3>Instructions</h3>
+                    <textarea id="instructions-input">1. The question should be clear and concise.
+2. Provide four answer options, marking the correct one.
+3. Include a brief explanation for the correct answer.
+4. Use the format "C:/Users/alam_/OneDrive/GCP/ANKI/+Question" for the "Image" field, where +Question is the text of the question.
+5. Include relevant tags in the "Tags" field tags 
+6. The answer options should appear in random order, i.e., the correct answer should not always be in the A position.</textarea>
+                </div>
+                <div id="tags-suggested" class="tab-content">
+                    <h3>Tags Suggested</h3>
+                    <textarea id="tags-input"># Fundamentals of Machine Learning
+"ML Algorithms", "Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Model Evaluation",
+# Model Development and Training
+"Data Preprocessing", "Feature Engineering", "Model Training", "Hyperparameter Tuning", "Overfitting and Underfitting",
+# Infrastructure and Scalability
+"Google Cloud ML Tools", "AI Platform", "BigQuery ML", "TensorFlow Extended (TFX)", "Data Pipelines",
+# Deployment and Operations
+"Model Deployment", "AI Platform Serving", "Model Monitoring", "Model Maintenance", "Optimization",
+# Ethics and Security
+"Bias and Fairness", "Explainability", "Data Privacy", "Model Security",
+# Google Cloud Specifics
+"IAM", "VPC", "Compute Engine", "Cloud Storage", "BigQuery", "Dataflow", "Pub/Sub", "Cloud Functions",
+# Theory and Mathematics
+"Probability", "Distributions", "Inferential Statistics", "Linear Algebra", "Calculus", "Gradient Descent",
+# Miscellaneous
+"Jupyter Notebooks", "Colab", "Git", "Docker", "Python", "SQL"</textarea>
+                </div>
+                <div id="image-path" class="tab-content">
+                    <h3>Image Path Format</h3>
+                    <input type="text" id="image-path-input" value='C:/Users/alam_/OneDrive/GCP/ANKI/+Question'>
+                </div>
+                <div id="expected-output" class="tab-content">
+                    <h3>Expected Output Example</h3>
+                    <textarea id="expected-output-input">[
+{
+"Question": "Why is Google considered a leader in AI and ML?",
+"Option1": "Google's focus on developing mobile applications.",
+"Option2": "Google's large advertising network.",
+"Option3": "Google's hardware products.",
+"Option4": "Google's history of innovation and responsible AI practices.",
+"Answer": "D",
+"Explanation": "Google is considered a leader in AI and ML due to its history of innovation, its use of AI from the beginning, and its focus on developing advanced and responsible AI technologies and products.",
+"Image": "C:/Users/alam_/OneDrive/GCP/ANKI/Why is Google considered a leader in AI and ML.png",
+"Tags": ["AI Platform", "Google Cloud ML Tools"]
+},
+{
+"Question": "What data processing technologies did Google develop in its early years?",
+"Option1": "TensorFlow and Keras.",
+"Option2": "Google File System (GFS) and MapReduce.",
+"Option3": "Scikit-learn y pandas.",
+"Option4": "BigQuery y Pub/Sub.",
+"Answer": "B",
+"Explanation": "En sus primeros años, Google desarrolló tecnologías como Google File System (GFS) y MapReduce para manejar el procesamiento de datos a gran escala.",
+"Image": "C:/Users/alam_/OneDrive/GCP/ANKI/What data processing technologies did Google develop in its early years.png",
+"Tags": ["Google Cloud ML Tools"]
+}
+]</textarea>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="generatePrompt()">Generate Prompt</button>
+            <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <div class="section" id="output" style="display: block; white-space: pre-wrap; background-color: #f4f4f4; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></div>
+        </div>
+
+        <div id="upload-section" class="section" style="display: none;">
+            <h2>Subir from JSON</h2>
+            <form id="json-upload-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <h2>Step 1: Enter JSON Input</h2>
+                    <textarea class="form-control" id="json-input" rows="5" placeholder="Paste your JSON here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <h2>Step 2: Enter Deck Name</h2>
+                    <input type="text" class="form-control" id="deck-name" placeholder="Enter deck name...">
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="startProcessing()">Start Processing</button>
+                <button type="button" class="btn btn-secondary btn-block" onclick="cancelProcessing()">Cancel</button>
+            </form>
+            <div class="progress mt-3" id="progress-container">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+            </div>
+            <div id="flashcard-container" class="flashcard-content mt-4"></div>
+            <div id="output-json" class="output mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.getElementById('prompt-section').style.display = 'none';
+            document.getElementById('upload-section').style.display = 'none';
+
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`#${tabId}`).classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        function generatePrompt() {
+            const text = document.getElementById('text-input').value;
+            const structure = document.getElementById('structure-input').value;
+            const instructions = document.getElementById('instructions-input').value;
+            const tags = document.getElementById('tags-input').value;
+            const imagePath = document.getElementById('image-path-input').value;
+            const expectedOutput = document.getElementById('expected-output-input').value;
+            const output = document.getElementById('output');
+
+            const prompt = `
+Please generate flashcards from the following text. Note that I am preparing for the Google Cloud Professional Machine Learning Engineer certification, so the flashcards should focus on key concepts relevant to this certification:
+
+${text}
+
+### Flashcard Structure
+${structure}
+
+### Instructions
+${instructions}
+
+### Tags Suggested
+${tags}
+
+### Image Path Format
+${imagePath}
+
+### Expected Output Example
+${expectedOutput}
+            `;
+
+            output.innerHTML = `<pre>${prompt}</pre>`;
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('output').innerText;
+            navigator.clipboard.writeText(output).then(function() {
+                alert('Prompt copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        let currentCardIndex = 0;
+        let flashcards = [];
+
+        function startProcessing() {
+            const jsonInput = document.getElementById('json-input').value;
+            const deckName = document.getElementById('deck-name').value;
+            const output = document.getElementById('output-json');
+
+            if (!jsonInput || !deckName) {
+                output.innerHTML = '<div class="alert alert-danger">Please provide both JSON input and deck name.</div>';
+                return;
+            }
+
+            try {
+                flashcards = JSON.parse(jsonInput);
+                currentCardIndex = 0;
+                document.getElementById('output-json').innerHTML = '';
+                document.getElementById('progress-bar').style.width = '0%';
+                document.getElementById('progress-bar').innerText = '0%';
+                processNextFlashcard(deckName);
+            } catch (e) {
+                output.innerHTML = `<div class="alert alert-danger">Invalid JSON: ${e.message}</div>`;
+            }
+        }
+
+        function cancelProcessing() {
+            currentCardIndex = flashcards.length;
+            document.getElementById('flashcard-container').innerHTML = '';
+            document.getElementById('output-json').innerHTML = '<div class="alert alert-warning">Processing cancelled.</div>';
+        }
+
+        function processNextFlashcard(deckName) {
+            if (currentCardIndex >= flashcards.length) {
+                document.getElementById('output-json').innerHTML += '<div class="alert alert-success">All flashcards processed successfully!</div>';
+                document.getElementById('flashcard-container').innerHTML = '';
+                return;
+            }
+
+            const card = flashcards[currentCardIndex];
+            displayFlashcard(card, deckName);
+        }
+
+        function displayFlashcard(card, deckName) {
+            const flashcardContainer = document.getElementById('flashcard-container');
+            flashcardContainer.innerHTML = `
+                <h2>Step 3: Upload Image for Flashcard ${currentCardIndex + 1}</h2>
+                <div class="card mb-4">
+                    <div class="card-body preview-container">
+                        <div class="text-container">
+                            <h5 class="card-title">Question</h5>
+                            <p class="card-text">${card.Question}</p>
+                            <h5 class="card-title">Options</h5>
+                            <ul>
+                                <li>A: ${card.Option1}</li>
+                                <li>B: ${card.Option2}</li>
+                                <li>C: ${card.Option3}</li>
+                                <li>D: ${card.Option4}</li>
+                            </ul>
+                            <h5 class="card-title">Answer</h5>
+                            <p class="card-text">${card.Answer}</p>
+                            <h5 class="card-title">Explanation</h5>
+                            <p class="card-text">${card.Explanation}</p>
+                            <h5 class="card-title">Tags</h5>
+                            <p class="card-text">${card.Tags.join(", ")}</p>
+                        </div>
+                        <div class="image-container">
+                            <img id="image-preview" src="" alt="No image uploaded">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h5 class="card-title">Upload Image</h5>
+                    <input type="file" class="form-control-file" id="image-input" accept="image/*" onchange="previewImage()">
+                    <button class="btn btn-danger mt-2" onclick="removeImage()">Remove Image</button>
+                    <button class="btn btn-success mt-2" onclick="uploadImage('${deckName}', '${card.Question}')">Create Flashcard</button>
+                </div>
+                <div class="instructions">Ensure the image is correct before creating the flashcard. You can remove and upload a new image if needed.</div>
+            `;
+        }
+
+        function previewImage() {
+            const imageInput = document.getElementById('image-input').files[0];
+            const imagePreview = document.getElementById('image-preview');
+
+            if (imageInput) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(imageInput);
+            } else {
+                imagePreview.src = "";
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('image-input').value = "";
+            document.getElementById('image-preview').src = "";
+        }
+
+        function uploadImage(deckName, question) {
+            const imageInput = document.getElementById('image-input').files[0];
+            if (!imageInput) {
+                alert("Please select an image to upload.");
+                return;
+            }
+
+            const fileName = `image_${question.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+            const formData = new FormData();
+            formData.append('file', new File([imageInput], fileName));
+
+            fetch('/upload_image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    flashcards[currentCardIndex].Image = data.filename;
+                    addFlashcard(deckName);
+                } else {
+                    alert("Error uploading image: " + data.message);
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error.message);
+            });
+        }
+
+        function addFlashcard(deckName) {
+            const card = flashcards[currentCardIndex];
+            fetch('/add_flashcards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    deck_name: deckName,
+                    flashcards: [card]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const output = document.getElementById('output-json');
+                data.forEach(result => {
+                    const statusClass = result.status === 'success' ? 'alert-success' : (result.status === 'duplicate' ? 'alert-warning' : 'alert-danger');
+                    output.innerHTML += `<div class="alert ${statusClass}">${result.message} for card: ${card.Question}</div>`;
+                });
+                updateProgress();
+                currentCardIndex++;
+                processNextFlashcard(deckName);
+            })
+            .catch(error => {
+                const output = document.getElementById('output-json');
+                output.innerHTML += `<div class="alert alert-danger">Error: ${error.message} for card: ${card.Question}</div>`;
+            });
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            const progress = ((currentCardIndex + 1) / flashcards.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.innerText = Math.round(progress) + '%';
+        }
+
+        document.addEventListener('paste', function(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imagePreview = document.getElementById('image-preview');
+                        imagePreview.src = e.target.result;
+                        const imageInput = new File([blob], `image_${flashcards[currentCardIndex].Question.replace(/[^a-zA-Z0-9]/g, '_')}.png`, { type: blob.type });
+                        document.getElementById('image-input').files = createFileList(imageInput);
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        function createFileList(file) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            return dataTransfer.files;
+        }
+    </script>
+</body>
+</html>

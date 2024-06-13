@@ -1,0 +1,81 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+h1 {
+    color: #0066cc;
+}
+.container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+button {
+    background-color: #0066cc;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+button:hover {
+    background-color: #005bb5;
+}
+pre {
+    background: #eaeaea;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    white-space: pre-wrap;
+}
+.tab-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    cursor: pointer;
+}
+.tab {
+    padding: 10px 20px;
+    background: #ddd;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    font-weight: bold;
+}
+.tab.active {
+    background: #0066cc;
+    color: white;
+}
+.tab-content {
+    display: none;
+    padding: 20px;
+    background: white;
+    border-radius: 0 4px 4px 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.tab-content.active {
+    display: block;
+}
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
