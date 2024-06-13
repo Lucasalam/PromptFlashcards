@@ -1,0 +1,101 @@
+{
+    "text_segment": "",
+    "flashcard_structure": {
+        "Answer": "",
+        "Explanation": "",
+        "Image": "",
+        "Option1": "",
+        "Option2": "",
+        "Option3": "",
+        "Option4": "",
+        "Question": "",
+        "Tags": []
+    },
+    "instructions": "1. The question should include a clear and concise context similar to the examples I've shared.\n2. Provide four answer options, marking the correct one.\n3. Include a brief explanation for the correct answer.\n4. Include relevant tags in the \"Tags\" field.\n5. The answer options should appear in random order, i.e., the correct answer should not always be in the A position.\n\nExample Contexts:\n1. You built and manage a production system that is responsible for predicting sales numbers.\n2. You are designing an ML recommendation model for shoppers on your company's e-commerce website.\n3. Your team needs to build a model that predicts whether images contain a driver's license, passport, or credit card.\n",
+    "tags_suggested": "# Fundamentals of Machine Learning\n\"ML Algorithms\", \"Supervised Learning\", \"Unsupervised Learning\", \"Reinforcement Learning\", \"Model Evaluation\",\n# Model Development and Training\n\"Data Preprocessing\", \"Feature Engineering\", \"Model Training\", \"Hyperparameter Tuning\", \"Overfitting and Underfitting\",\n# Infrastructure and Scalability\n\"Google Cloud ML Tools\", \"AI Platform\", \"BigQuery ML\", \"TensorFlow Extended (TFX)\", \"Data Pipelines\",\n# Deployment and Operations\n\"Model Deployment\", \"AI Platform Serving\", \"Model Monitoring\", \"Model Maintenance\", \"Optimization\",\n# Ethics and Security\n\"Bias and Fairness\", \"Explainability\", \"Data Privacy\", \"Model Security\",\n# Google Cloud Specifics\n\"IAM\", \"VPC\", \"Compute Engine\", \"Cloud Storage\", \"BigQuery\", \"Dataflow\", \"Pub/Sub\", \"Cloud Functions\",\n# Theory and Mathematics\n\"Probability\", \"Distributions\", \"Inferential Statistics\", \"Linear Algebra\", \"Calculus\", \"Gradient Descent\",\n# Miscellaneous\n\"Jupyter Notebooks\", \"Colab\", \"Git\", \"Docker\", \"Python\", \"SQL\"",
+    "image_path_format": "\" \"",
+    "expected_output_example": [
+        {
+            "Question": "How should you configure the pipeline to detect anomalies in real-time sensor data using Pub/Sub and store the results for analytics and visualization?",
+            "Option1": "1 = DataProc, 2 = AutoML, 3 = Cloud Bigtable",
+            "Option2": "1 = BigQuery, 2 = AutoML, 3 = Cloud Functions",
+            "Option3": "1 = BigQuery, 2 = AI Platform, 3 = Cloud Storage",
+            "Option4": "1 = Dataflow, 2 = AI Platform, 3 = BigQuery",
+            "Answer": "D",
+            "Explanation": "To detect anomalies in real-time sensor data, you can use Dataflow to process the data, AI Platform to run ML models, and BigQuery to store the results for analytics and visualization.",
+            "Image": "",
+            "Tags": [
+                "Google Cloud ML Tools",
+                "Data Pipelines",
+                "Model Deployment",
+                "BigQuery",
+                "Dataflow"
+            ]
+        },
+        {
+            "Question": "What approach should you take to make your internal shuttle service route more efficient using Google Kubernetes Engine?",
+            "Option1": "1. Define the optimal route as the shortest route that passes by all shuttle stations with confirmed attendance at the given time under capacity constraints. 2. Dispatch an appropriately sized shuttle and indicate the required stops on the map.",
+            "Option2": "1. Build a reinforcement learning model with tree-based classification models that predict the presence of passengers at shuttle stops as agents and a reward function around a distance-based metric. 2. Dispatch an appropriately sized shuttle and provide the map with the required stops based on the simulated outcome.",
+            "Option3": "1. Build a tree-based regression model that predicts how many passengers will be picked up at each shuttle station. 2. Dispatch an appropriately sized shuttle and provide the map with the required stops based on the prediction.",
+            "Option4": "1. Build a tree-based classification model that predicts whether the shuttle should pick up passengers at each shuttle station. 2. Dispatch an available shuttle and provide the map with the required stops based on the prediction.",
+            "Answer": "A",
+            "Explanation": "The best approach is to define the optimal route as the shortest route that passes by all shuttle stations with confirmed attendance at the given time under capacity constraints, and then dispatch an appropriately sized shuttle indicating the required stops on the map.",
+            "Image": "",
+            "Tags": [
+                "Google Cloud ML Tools",
+                "Model Training",
+                "Model Deployment",
+                "Optimization",
+                "Google Kubernetes Engine"
+            ]
+        },
+        {
+            "Question": "Your company wants to use AI to automatically tag the main words in legal documents. Which feature of the Natural Language API can help with this?",
+            "Option1": "Syntax analysis",
+            "Option2": "Entity analysis",
+            "Option3": "Sentiment analysis",
+            "Option4": "Category analysis",
+            "Answer": "B",
+            "Explanation": "Entity analysis identifies key subjects in the text, including proper nouns and common nouns, allowing for automatic tagging.",
+            "Image": "",
+            "Tags": [
+                "Google Cloud ML Tools",
+                "Entity Analysis",
+                "Natural Language API"
+            ]
+        },
+        {
+            "Question": "Your organization wants to make its internal shuttle service route more efficient. The shuttles currently stop at all pick-up points across the city every 30 minutes between 7 am and 10 am. The development team has already built an application on Google Kubernetes Engine that requires users to confirm their presence and shuttle station one day in advance. What approach should you take?",
+            "Option1": "Build a tree-based regression model that predicts how many passengers will be picked up at each shuttle station. 2. Dispatch an appropriately sized shuttle and provide the map with the required stops based on the prediction.",
+            "Option2": "Build a tree-based classification model that predicts whether the shuttle should pick up passengers at each shuttle station. 2. Dispatch an available shuttle and provide the map with the required stops based on the prediction.",
+            "Option3": "Define the optimal route as the shortest route that passes by all shuttle stations with confirmed attendance at the given time under capacity constraints. 2. Dispatch an appropriately sized shuttle and indicate the required stops on the map.",
+            "Option4": "Build a reinforcement learning model with tree-based classification models that predict the presence of passengers at shuttle stops as agents and a reward function around a distance-based metric. 2. Dispatch an appropriately sized shuttle and provide the map with the required stops based on the simulated outcome.",
+            "Answer": "C",
+            "Explanation": "The best approach is to define the optimal route as the shortest route that passes by all shuttle stations with confirmed attendance at the given time under capacity constraints, and then dispatch an appropriately sized shuttle indicating the required stops on the map.",
+            "Image": "",
+            "Tags": [
+                "Google Cloud ML Tools",
+                "Model Training",
+                "Model Deployment",
+                "Optimization",
+                "Google Kubernetes Engine"
+            ]
+        },
+        {
+            "Question": "You work for an online retail company that is creating a visual search engine. You have set up an end-to-end ML pipeline on Google Cloud to classify whether an image contains your company's product. Expecting the release of new products in the near future, you configured a retraining functionality in the pipeline so that new data can be fed into your ML models. You also want to use AI Platform's continuous evaluation service to ensure that the models have high accuracy on your test dataset. What should you do?",
+            "Option1": "Keep the original test dataset unchanged even if newer products are incorporated into retraining.",
+            "Option2": "Extend your test dataset with images of the newer products when they are introduced to retraining.",
+            "Option3": "Replace your test dataset with images of the newer products when they are introduced to retraining.",
+            "Option4": "Update your test dataset with images of the newer products when your evaluation metrics drop below a pre-decided threshold.",
+            "Answer": "B",
+            "Explanation": "Extending your test dataset with images of the newer products ensures that the evaluation metrics accurately reflect the performance of the model on both old and new products.",
+            "Image": "",
+            "Tags": [
+                "Google Cloud ML Tools",
+                "AI Platform",
+                "Model Evaluation",
+                "Continuous Evaluation"
+            ]
+        }
+    ]
+}

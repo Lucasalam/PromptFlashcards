@@ -116,80 +116,28 @@
                 </div>
                 <div id="flashcard-structure" class="tab-content">
                     <h3>Flashcard Structure</h3>
-                    <textarea id="structure-input">{
-"Question": "",
-"Option1": "",
-"Option2": "",
-"Option3": "",
-"Option4": "",
-"Answer": "",
-"Explanation": "",
-"Image": "",
-"Tags": []
-}</textarea>
+                    <textarea id="structure-input"></textarea>
                 </div>
                 <div id="instructions" class="tab-content">
                     <h3>Instructions</h3>
-                    <textarea id="instructions-input">1. The question should be clear and concise.
-2. Provide four answer options, marking the correct one.
-3. Include a brief explanation for the correct answer.
-4. Use the format "C:/Users/alam_/OneDrive/GCP/ANKI/+Question" for the "Image" field, where +Question is the text of the question.
-5. Include relevant tags in the "Tags" field tags 
-6. The answer options should appear in random order, i.e., the correct answer should not always be in the A position.</textarea>
+                    <textarea id="instructions-input"></textarea>
                 </div>
                 <div id="tags-suggested" class="tab-content">
                     <h3>Tags Suggested</h3>
-                    <textarea id="tags-input"># Fundamentals of Machine Learning
-"ML Algorithms", "Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Model Evaluation",
-# Model Development and Training
-"Data Preprocessing", "Feature Engineering", "Model Training", "Hyperparameter Tuning", "Overfitting and Underfitting",
-# Infrastructure and Scalability
-"Google Cloud ML Tools", "AI Platform", "BigQuery ML", "TensorFlow Extended (TFX)", "Data Pipelines",
-# Deployment and Operations
-"Model Deployment", "AI Platform Serving", "Model Monitoring", "Model Maintenance", "Optimization",
-# Ethics and Security
-"Bias and Fairness", "Explainability", "Data Privacy", "Model Security",
-# Google Cloud Specifics
-"IAM", "VPC", "Compute Engine", "Cloud Storage", "BigQuery", "Dataflow", "Pub/Sub", "Cloud Functions",
-# Theory and Mathematics
-"Probability", "Distributions", "Inferential Statistics", "Linear Algebra", "Calculus", "Gradient Descent",
-# Miscellaneous
-"Jupyter Notebooks", "Colab", "Git", "Docker", "Python", "SQL"</textarea>
+                    <textarea id="tags-input"></textarea>
                 </div>
                 <div id="image-path" class="tab-content">
                     <h3>Image Path Format</h3>
-                    <input type="text" id="image-path-input" value='C:/Users/alam_/OneDrive/GCP/ANKI/+Question'>
+                    <input type="text" id="image-path-input">
                 </div>
                 <div id="expected-output" class="tab-content">
                     <h3>Expected Output Example</h3>
-                    <textarea id="expected-output-input">[
-{
-"Question": "Why is Google considered a leader in AI and ML?",
-"Option1": "Google's focus on developing mobile applications.",
-"Option2": "Google's large advertising network.",
-"Option3": "Google's hardware products.",
-"Option4": "Google's history of innovation and responsible AI practices.",
-"Answer": "D",
-"Explanation": "Google is considered a leader in AI and ML due to its history of innovation, its use of AI from the beginning, and its focus on developing advanced and responsible AI technologies and products.",
-"Image": "C:/Users/alam_/OneDrive/GCP/ANKI/Why is Google considered a leader in AI and ML.png",
-"Tags": ["AI Platform", "Google Cloud ML Tools"]
-},
-{
-"Question": "What data processing technologies did Google develop in its early years?",
-"Option1": "TensorFlow and Keras.",
-"Option2": "Google File System (GFS) and MapReduce.",
-"Option3": "Scikit-learn y pandas.",
-"Option4": "BigQuery y Pub/Sub.",
-"Answer": "B",
-"Explanation": "En sus primeros años, Google desarrolló tecnologías como Google File System (GFS) y MapReduce para manejar el procesamiento de datos a gran escala.",
-"Image": "C:/Users/alam_/OneDrive/GCP/ANKI/What data processing technologies did Google develop in its early years.png",
-"Tags": ["Google Cloud ML Tools"]
-}
-]</textarea>
+                    <textarea id="expected-output-input"></textarea>
                 </div>
             </div>
             <button class="btn btn-success" onclick="generatePrompt()">Generate Prompt</button>
             <button class="btn btn-info" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="btn btn-warning" onclick="saveDefaultInfo()">Save Default Info</button>
             <div class="section" id="output" style="display: block; white-space: pre-wrap; background-color: #f4f4f4; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></div>
         </div>
 
@@ -355,7 +303,7 @@ ${expectedOutput}
                     <h5 class="card-title">Upload Image</h5>
                     <input type="file" class="form-control-file" id="image-input" accept="image/*" onchange="previewImage()">
                     <button class="btn btn-danger mt-2" onclick="removeImage()">Remove Image</button>
-                    <button class="btn btn-success mt-2" onclick="uploadImage('${deckName}', '${card.Question}')">Create Flashcard</button>
+                    <button class="btn btn-success mt-2" onclick="uploadImage('${deckName}')">Create Flashcard</button>
                 </div>
                 <div class="instructions">Ensure the image is correct before creating the flashcard. You can remove and upload a new image if needed.</div>
             `;
@@ -381,16 +329,15 @@ ${expectedOutput}
             document.getElementById('image-preview').src = "";
         }
 
-        function uploadImage(deckName, question) {
+        function uploadImage(deckName) {
             const imageInput = document.getElementById('image-input').files[0];
             if (!imageInput) {
                 alert("Please select an image to upload.");
                 return;
             }
 
-            const fileName = `image_${question.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
             const formData = new FormData();
-            formData.append('file', new File([imageInput], fileName));
+            formData.append('file', imageInput);
 
             fetch('/upload_image', {
                 method: 'POST',
@@ -446,6 +393,52 @@ ${expectedOutput}
             progressBar.innerText = Math.round(progress) + '%';
         }
 
+        function saveDefaultInfo() {
+            const data = {
+                text_segment: document.getElementById('text-input').value,
+                flashcard_structure: JSON.parse(document.getElementById('structure-input').value),
+                instructions: document.getElementById('instructions-input').value,
+                tags_suggested: document.getElementById('tags-input').value,
+                image_path_format: document.getElementById('image-path-input').value,
+                expected_output_example: JSON.parse(document.getElementById('expected-output-input').value)
+            };
+
+            fetch('/update_default_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Default information updated successfully!');
+                } else {
+                    alert('Failed to update default information.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating default info:', error);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/get_default_info')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('text-input').value = data.text_segment;
+                    document.getElementById('structure-input').value = JSON.stringify(data.flashcard_structure, null, 4);
+                    document.getElementById('instructions-input').value = data.instructions;
+                    document.getElementById('tags-input').value = data.tags_suggested;
+                    document.getElementById('image-path-input').value = data.image_path_format;
+                    document.getElementById('expected-output-input').value = JSON.stringify(data.expected_output_example, null, 4);
+                })
+                .catch(error => {
+                    console.error('Error loading default info:', error);
+                });
+        });
+
         document.addEventListener('paste', function(event) {
             const items = (event.clipboardData || event.originalEvent.clipboardData).items;
             for (let i = 0; i < items.length; i++) {
@@ -455,7 +448,7 @@ ${expectedOutput}
                     reader.onload = function(e) {
                         const imagePreview = document.getElementById('image-preview');
                         imagePreview.src = e.target.result;
-                        const imageInput = new File([blob], `image_${flashcards[currentCardIndex].Question.replace(/[^a-zA-Z0-9]/g, '_')}.png`, { type: blob.type });
+                        const imageInput = new File([blob], `${generateTimestamp()}.png`, { type: blob.type });
                         document.getElementById('image-input').files = createFileList(imageInput);
                     };
                     reader.readAsDataURL(blob);
@@ -467,6 +460,17 @@ ${expectedOutput}
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             return dataTransfer.files;
+        }
+
+        function generateTimestamp() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            return `${year}${month}${day}_${hours}${minutes}${seconds}`;
         }
     </script>
 </body>

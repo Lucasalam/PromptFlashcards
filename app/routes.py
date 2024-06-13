@@ -2,11 +2,70 @@ import os
 import json
 import base64
 import requests
-from flask import request, jsonify, render_template
-from app import app
+from flask import Blueprint, request, jsonify, render_template, current_app
 
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+main = Blueprint('main', __name__)
+
+@main.route('/')
+def index():
+    return render_template('index.html')
+
+@main.route('/upload_image', methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "message": "No file part in the request"})
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "No selected file"})
+    
+    if file:
+        filename = file.filename
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        return jsonify({"status": "success", "filename": filename})
+
+@main.route('/add_flashcards', methods=['POST'])
+def add_flashcards():
+    data = request.json
+    deck_name = data['deck_name']
+    flashcards = data['flashcards']
+    
+    results = []
+    for card in flashcards:
+        result = add_flashcard(
+            deck_name,
+            card['Question'],
+            card['Option1'],
+            card['Option2'],
+            card['Option3'],
+            card['Option4'],
+            card['Answer'],
+            card['Explanation'],
+            card.get('Image', ''),
+            card['Tags']
+        )
+        results.append(result)
+    
+    return jsonify(results)
+
+@main.route('/get_default_info')
+def get_default_info():
+    try:
+        with open(os.path.join(current_app.static_folder, 'default_info.json')) as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@main.route('/update_default_info', methods=['POST'])
+def update_default_info():
+    try:
+        data = request.json
+        with open(os.path.join(current_app.static_folder, 'default_info.json'), 'w') as f:
+            json.dump(data, f, indent=4)
+        return jsonify({"status": "success", "message": "Default information updated successfully"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 def add_flashcard(deck_name, question, option1, option2, option3, option4, answer, explanation, image_filename, tags):
     url = 'http://localhost:8765'
@@ -14,7 +73,7 @@ def add_flashcard(deck_name, question, option1, option2, option3, option4, answe
 
     encoded_image = None
     if image_filename:
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+        image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename)
         if os.path.exists(image_path):
             with open(image_path, "rb") as image_file:
                 encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
@@ -98,45 +157,3 @@ def add_flashcard(deck_name, question, option1, option2, option3, option4, answe
         return {"status": "error", "message": f"Error al agregar la flashcard: {response.json()}"}
     
     return {"status": "success", "message": "Flashcard agregada con éxito"}
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/add_flashcards', methods=['POST'])
-def add_flashcards():
-    data = request.json
-    deck_name = data['deck_name']
-    flashcards = data['flashcards']
-    
-    results = []
-    for card in flashcards:
-        result = add_flashcard(
-            deck_name,
-            card['Question'],
-            card['Option1'],
-            card['Option2'],
-            card['Option3'],
-            card['Option4'],
-            card['Answer'],
-            card['Explanation'],
-            card.get('Image', ''),
-            card['Tags']
-        )
-        results.append(result)
-    
-    return jsonify(results)
-
-@app.route('/upload_image', methods=['POST'])
-def upload_image():
-    if 'file' not in request.files:
-        return jsonify({"status": "error", "message": "No file part in the request"})
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"status": "error", "message": "No selected file"})
-    
-    if file:
-        filename = file.filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return jsonify({"status": "success", "filename": filename})
