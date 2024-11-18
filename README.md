@@ -54,3 +54,76 @@ Esta aplicación web permite generar flashcards a partir de un prompt y subir fl
 Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
 
+WITH 
+  -- 1. Crear intervalos dinámicos usando percentiles
+  intervalos AS (
+    SELECT
+      APPROX_QUANTILES(variablenumerica, 10) AS bucket_edges
+    FROM `proyecto.dataset.x`
+  ),
+
+  -- 2. Asignar valores a intervalos
+  datos_discretizados AS (
+    SELECT
+      t.periodo,
+      t.variablenumerica,
+      ARRAY_POSITION(i.bucket_edges, 
+        (SELECT MAX(edge) FROM UNNEST(i.bucket_edges) AS edge WHERE edge <= t.variablenumerica)
+      ) AS bucket_id
+    FROM `proyecto.dataset.x` t
+    CROSS JOIN intervalos i
+  ),
+
+  -- 3. Calcular distribuciones por periodo
+  distribuciones AS (
+    SELECT
+      periodo,
+      bucket_id,
+      COUNT(*) AS conteo,
+      COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY periodo) AS distribucion
+    FROM datos_discretizados
+    GROUP BY periodo, bucket_id
+  ),
+
+  -- 4. Crear pares de periodos consecutivos
+  pares_periodos AS (
+    SELECT 
+      d1.periodo AS periodo_base,
+      d2.periodo AS periodo_comparacion,
+      d1.bucket_id
+    FROM distribuciones d1
+    JOIN distribuciones d2
+      ON d2.periodo = DATE_ADD(d1.periodo, INTERVAL 1 MONTH)
+      AND d1.bucket_id = d2.bucket_id
+  ),
+
+  -- 5. Calcular PSI para cada bucket
+  psi_calculo AS (
+    SELECT
+      p.periodo_base,
+      "variablenumerica" AS nombre_variable,
+      COALESCE((d1.distribucion - d2.distribucion) * LOG(d1.distribucion / d2.distribucion), 0) AS psi_bucket
+    FROM pares_periodos p
+    JOIN distribuciones d1
+      ON p.periodo_base = d1.periodo AND p.bucket_id = d1.bucket_id
+    JOIN distribuciones d2
+      ON p.periodo_comparacion = d2.periodo AND p.bucket_id = d2.bucket_id
+  ),
+
+  -- 6. Sumar PSI por periodo base
+  psi_por_periodo AS (
+    SELECT
+      periodo_base AS periodo,
+      nombre_variable,
+      SUM(psi_bucket) AS psi
+    FROM psi_calculo
+    GROUP BY periodo_base, nombre_variable
+  )
+
+-- 7. Resultados finales
+SELECT 
+  periodo,
+  nombre_variable,
+  psi
+FROM psi_por_periodo
+ORDER BY periodo;
